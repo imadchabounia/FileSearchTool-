@@ -18,7 +18,7 @@ int cnt_fichiers = 0; //compteur pour le nombre de fichiers trouvés
 
 char* concat(const char* s1, const char* s2){
   //concatener deux const
-  char* res = malloc(sizeof(char)*(strlen(s1)+strlen(s2)));
+  char* res = malloc(sizeof(char)*(strlen(s1)+strlen(s2)+1));
   int i;
   for(i=0; i<(int)strlen(s1); i++){
     *(res+i)=s1[i];
@@ -26,6 +26,7 @@ char* concat(const char* s1, const char* s2){
   for(i=0; i<(int)strlen(s2); i++){
     *(res+i+(int)strlen(s1))=s2[i];
   }
+  *(res+i+(int)strlen(s1))='\0';
   return res;
 }
 
@@ -58,7 +59,7 @@ void showFileType(mode_t st_mode){
 }
 void showPermissions(mode_t st_mode){
   //afficher avec le style linux, (owner, group, other users)
-  printf("[+] protection du fichier(format linux) : ");
+  printf("[+] protection du fichier : ");
   printf( (S_ISDIR(st_mode)) ? "d" : "-");
   printf( (st_mode & S_IRUSR) ? "r" : "-");
   printf( (st_mode & S_IWUSR) ? "w" : "-");
@@ -115,7 +116,7 @@ struct stat getFileInode(const char* nom_repertoire, const char* nom_fichier){
   char* path = concat(nom_repertoire, nom_fichier);
   struct stat buf;
   if(stat(path, &buf)==-1){
-    printf("%s\n", "Impossible d'acceder a (tous ou certains) elements de l'inode");
+    printf("%s\n", "Impossible de lite (tous ou certains) elements de l'inode(Probleme protection)");
     return buf;
   }
   return buf;
@@ -139,7 +140,7 @@ int wildcardMatch(const char* s, const char* pattern){
         if(dp[i-1][j]==1 || dp[i][j-1]==1){
           dp[i][j]=1;
         }
-      }else if(pattern[j]=='?' || (pattern[j-1]==s[i-1])){
+      }else if(pattern[j-1]=='?' || (pattern[j-1]==s[i-1])){
         dp[i][j]=dp[i-1][j-1];
       }
     }
