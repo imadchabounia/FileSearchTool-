@@ -8,13 +8,9 @@
 #include <time.h>
 #include <regex.h>
 
-/*
-search [nom_repertoire] [-options] [fichier]
-*/
-
 typedef struct dirent dirent;
 
-int cnt_fichiers = 0; //compteur pour le nombre de fichiers trouvés
+int cnt_fichiers = 0;
 
 char* concat(const char* s1, const char* s2){
   //concatener deux const
@@ -78,34 +74,32 @@ void afficherFichierInfo(struct stat buf, const char* options){
     switch (options[i]) {
       case 'd':
       //date dernier accés
-      printf("[+] date du dernier acces : ");
+      printf("[+] Most recent access date : ");
       showDate(buf.st_atime);
       //date dernière modification
-      printf("[+] date de la dernière modification : ");
+      printf("[+] Last modification date : ");
       showDate(buf.st_mtime);
       break;
       case 'm':
-      printf("[+] date de la dernière modification : ");
+      printf("[+] Last modification date : ");
       showDate(buf.st_mtime);
       break;
       case 't':
-      //afficher le type du fichier
       showFileType(buf.st_mode);
       break;
       case 's':
-      printf("[+] la taille du fichier en octets : %ld \n", (long )buf.st_size);
+      printf("[+] File size (bytes) : %ld \n", (long )buf.st_size);
       break;
       case 'p':
-      //afficher la protection du fichier
       showPermissions(buf.st_mode);
       break;
       case 'a':
-      printf("[+] date du dernier acces : ");
+      printf("[+] Most recent access date : ");
       showDate(buf.st_atime);
-      printf("[+] date de la dernière modification : ");
+      printf("[+] Last modification date : ");
       showDate(buf.st_mtime);
       showFileType(buf.st_mode);
-      printf("[+] la taille du fichier en octets : %ld \n", (long )buf.st_size);
+      printf("[+] FIle size (bytes) : %ld \n", (long )buf.st_size);
       showPermissions(buf.st_mode);
       break;
     }
@@ -116,7 +110,7 @@ struct stat getFileInode(const char* nom_repertoire, const char* nom_fichier){
   char* path = concat(nom_repertoire, nom_fichier);
   struct stat buf;
   if(stat(path, &buf)==-1){
-    printf("%s\n", "Impossible de lite (tous ou certains) elements de l'inode(Probleme protection)");
+    printf("%s\n", "Unable to access inode elements)");
     return buf;
   }
   return buf;
@@ -193,7 +187,7 @@ char* convertToFitRegex(const char* s){
   }
   return ret;
 }
-
+/* you can use this if you want regex
 int match(const char* s, const char* pattern){
   regex_t regex;
   int value = regcomp(&regex, pattern, 0);
@@ -210,6 +204,7 @@ int match(const char* s, const char* pattern){
   printf("erreur!!!\n");
   return -1;
 }
+*/
 void search_files(const char* nom_repertoire, const char* nom_fichier, const char* options, int niveau){
   if(niveau == -1) return;
   //printf("%s\n", nom_repertoire);
@@ -217,7 +212,7 @@ void search_files(const char* nom_repertoire, const char* nom_fichier, const cha
   struct dirent* dEntry;
   rep = opendir(nom_repertoire);
   if(rep == NULL){
-    printf("Impossible d'ouvrir le repertoire %s \n", nom_repertoire);
+    printf("Can't open the file %s \n", nom_repertoire);
     return;
   }
   while(dEntry = readdir(rep)){
@@ -259,8 +254,8 @@ void search(const char* nom_repertoire, const char* nom_fichier, const char* opt
 int main(int argc, char const *argv[]) {
   //nom du fichier est obligatoire
   if(argc<2){
-    printf("[!] Argument manquant\n");
-    printf("%s\n", "[+] Format attendu : ./search [Nom_du_Repertoire] [-options] Nom_de_fichier");
+    printf("[!] Missing arguments\n");
+    printf("%s\n", "[+] Expected format : ./search [Directory] [-option] file_name");
     return 1;
   }
   const char* nom_repertoire;
